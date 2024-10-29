@@ -8,10 +8,8 @@
 </head>
 <body>
     <div class="container">
+        <button id="reloadButton">Reload Page</button>
         <h2>GPD Badami Bagh</h2>
-
-     
-        
         <!-- Button to open the camera -->
         <button id="open-camera">Open Camera</button>
 
@@ -53,8 +51,12 @@
         const classNameSelect = document.getElementById('class-name');
         const apiKey = '3dfx2fWNVJdYHNEiZfwaRmbq'; // Replace with your remove.bg API key
         let stream;
+        
 
         // Open the device camera
+        document.getElementById('reloadButton').addEventListener('click', function() {
+    location.reload(); // Reloads the current page
+});
         openCameraButton.addEventListener('click', async () => {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
