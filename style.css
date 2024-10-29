@@ -6,9 +6,8 @@ body {
     padding: 20px;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden; /* Prevent scrolling on small screens */
+    align-items: flex-start; /* Change from center to flex-start to allow scrolling */
+    min-height: 100vh; /* Ensure the body takes at least full height */
 }
 
 .container {
@@ -19,6 +18,8 @@ body {
     width: 90%; /* Full width on mobile */
     max-width: 400px; /* Limit max width */
     text-align: center;
+    overflow: auto; /* Enable scrolling for the container */
+    max-height: 80vh; /* Limit the height of the container for scrolling */
 }
 
 h2 {
@@ -31,7 +32,8 @@ h2 {
 .upload-btn,
 .download-btn,
 #open-camera,
-#capture-photo {
+#capture-photo,
+#reloadButton { /* Include reload button in styles */
     background-color: #007bff;
     color: #fff;
     border: none;
@@ -47,7 +49,8 @@ h2 {
 .upload-btn:hover,
 .download-btn:hover,
 #open-camera:hover,
-#capture-photo:hover {
+#capture-photo:hover,
+#reloadButton:hover { /* Include hover effect for reload button */
     background-color: #0056b3;
 }
 
@@ -100,7 +103,8 @@ video {
     .upload-btn,
     .download-btn,
     #open-camera,
-    #capture-photo {
+    #capture-photo,
+    #reloadButton { /* Include reload button for mobile styles */
         font-size: 0.9rem; /* Smaller button text */
         padding: 10px; /* Adjust padding */
     }
