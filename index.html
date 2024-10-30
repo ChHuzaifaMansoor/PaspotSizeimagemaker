@@ -136,12 +136,12 @@ async function resizeAndCompressImage(img) {
     // Draw the image on top of the white background
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    quality = 0.25; // Start with high quality
+     let quality = 0.9; // Start with high quality
     let resizedCompressedImage = canvas.toDataURL('image/jpeg', quality);
 
     // Reduce quality until image size is around 25KB
-    while (resizedCompressedImage.length > 25000 && quality > 0.25) {
-        quality -= 0.25;
+    while (resizedCompressedImage.length > 25000 && quality > 0.1) {
+        quality -= 0.05;
         resizedCompressedImage = canvas.toDataURL('image/jpeg', quality);
     }
 
