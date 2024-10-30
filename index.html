@@ -19,7 +19,7 @@
             <select id="class-name" required>
                 <option value="" disabled selected>Select Class</option>
                 <option value="Nursery">Nursery</option>
-                <option value="Pre-K">Preep</option>
+                <option value="Pre-K">Pre-K</option>
                 <option value="1st">1st</option>
                 <option value="2nd">2nd</option>
                 <option value="3rd">3rd</option>
@@ -119,7 +119,7 @@
         });
 
   // Helper function to resize, add white background, and compress the image
-async function resizeAndCompressImage(img) {
+  async function resizeAndCompressImage(img) {
     const dpi = 96;
     const inchesToPixels = dpi * 2; // 2 inches at 96 DPI
     const canvas = document.createElement('canvas');
@@ -136,17 +136,22 @@ async function resizeAndCompressImage(img) {
     // Draw the image on top of the white background
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-     let quality = 0.9; // Start with high quality
+    let quality = 0.9; // Start with high quality
     let resizedCompressedImage = canvas.toDataURL('image/jpeg', quality);
 
-    // Reduce quality until image size is around 25KB
-    while (resizedCompressedImage.length > 25000 && quality > 0.1) {
-        quality -= 0.05;
+    // Adjust quality until image size is between 20KB and 25KB
+    while ((resizedCompressedImage.length > 25000 || resizedCompressedImage.length < 20000) && quality > 0.1) {
+        if (resizedCompressedImage.length > 25000) {
+            quality -= 0.05; // Decrease quality if image is too large
+        } else if (resizedCompressedImage.length < 20000) {
+            quality += 0.01; // Slightly increase quality if image is too small
+        }
         resizedCompressedImage = canvas.toDataURL('image/jpeg', quality);
     }
 
     return resizedCompressedImage;
 }
+
 
     </script>
 </body>
