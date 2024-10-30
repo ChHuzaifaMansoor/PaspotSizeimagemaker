@@ -1,3 +1,4 @@
+<!-- 3dfx2fWNVJdYHNEiZfwaRmbq -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,31 +8,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-         <button id="reloadButton" style="
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        background-color: #4CAF50; /* Green background */
-        color: white; /* White text */
-        border: none;
-        border-radius: 5px;
-        transition: background-color 0.3s;
-    ">Reload Page</button>
+    <div style="background-color: aqua;" class="container">
         <h2>GPD Badami Bagh</h2>
-        <!-- Button to open the camera -->
         <button id="open-camera">Open Camera</button>
-
-        <!-- Camera stream for live preview -->
         <video id="camera-stream" autoplay playsinline style="display: none;"></video>
-
-        <!-- Capture button to take a photo from the live stream -->
         <button id="capture-photo" style="display: none;">Capture Photo</button>
-
-        <!-- Display captured and processed images -->
         <img id="processed-image" alt="Processed Image" style="display: none; width: 100%; height: auto;">
-
-        <!-- Input fields for student name and class selection -->
         <div class="info-section">
             <input type="text" id="student-name" placeholder="Enter student name" required>
             <select id="class-name" required>
@@ -45,8 +27,6 @@
                 <option value="5th">5th</option>
             </select>
         </div>
-
-        <!-- Download button to save the processed image with custom filename -->
         <button class="download-btn" id="download-btn" style="display: none;">Download Image</button>
     </div>
 
@@ -60,12 +40,8 @@
         const classNameSelect = document.getElementById('class-name');
         const apiKey = '3dfx2fWNVJdYHNEiZfwaRmbq'; // Replace with your remove.bg API key
         let stream;
-        
 
         // Open the device camera
-        document.getElementById('reloadButton').addEventListener('click', function() {
-    location.reload(); // Reloads the current page
-});
         openCameraButton.addEventListener('click', async () => {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
@@ -79,7 +55,6 @@
             }
         });
 
-        // Capture photo from the video stream
         captureButton.addEventListener('click', async () => {
             const canvas = document.createElement('canvas');
             canvas.width = cameraStream.videoWidth;
@@ -87,12 +62,10 @@
             const context = canvas.getContext('2d');
             context.drawImage(cameraStream, 0, 0, canvas.width, canvas.height);
 
-            // Stop the video stream
             stream.getTracks().forEach(track => track.stop());
             cameraStream.style.display = 'none';
             captureButton.style.display = 'none';
 
-            // Convert canvas to a blob for API processing
             canvas.toBlob(async (blob) => {
                 const formData = new FormData();
                 formData.append('image_file', blob);
@@ -107,12 +80,17 @@
 
                     if (response.ok) {
                         const processedBlob = await response.blob();
-                        const objectURL = URL.createObjectURL(processedBlob);
+                        const processedObjectURL = URL.createObjectURL(processedBlob);
 
-                        // Display the processed image
-                        processedImage.src = objectURL;
-                        processedImage.style.display = 'block';
-                        downloadBtn.style.display = 'inline';
+                        // Create an image object to resize and compress
+                        const img = new Image();
+                        img.src = processedObjectURL;
+                        img.onload = async function() {
+                            const resizedAndCompressedImage = await resizeAndCompressImage(img);
+                            processedImage.src = resizedAndCompressedImage;
+                            processedImage.style.display = 'block';
+                            downloadBtn.style.display = 'inline';
+                        };
                     } else {
                         console.error('Error:', response.statusText);
                         alert('Background removal failed. Please try again.');
@@ -124,7 +102,6 @@
             }, 'image/jpeg');
         });
 
-        // Download the processed image with a custom filename
         downloadBtn.addEventListener('click', () => {
             const studentName = studentNameInput.value.trim();
             const className = classNameSelect.value;
@@ -140,6 +117,37 @@
             link.download = `${filename}.jpg`;
             link.click();
         });
+
+  // Helper function to resize, add white background, and compress the image
+async function resizeAndCompressImage(img) {
+    const dpi = 96;
+    const inchesToPixels = dpi * 2; // 2 inches at 96 DPI
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas size to 2x2 inches in pixels
+    canvas.width = inchesToPixels;
+    canvas.height = inchesToPixels;
+
+    // Fill canvas with white background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the image on top of the white background
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    let quality = 0.9; // Start with high quality
+    let resizedCompressedImage = canvas.toDataURL('image/jpeg', quality);
+
+    // Reduce quality until image size is around 25KB
+    while (resizedCompressedImage.length > 25000 && quality > 0.1) {
+        quality -= 0.05;
+        resizedCompressedImage = canvas.toDataURL('image/jpeg', quality);
+    }
+
+    return resizedCompressedImage;
+}
+
     </script>
 </body>
 </html>
