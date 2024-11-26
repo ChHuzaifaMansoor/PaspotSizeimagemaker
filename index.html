@@ -18,7 +18,7 @@
             <select id="class-name" required>
                 <option value="" disabled selected>Select Class</option>
                 <option value="Nursery">Nursery</option>
-                <option value="Preep">Preep</option>
+                <option value="Pre-K">Pre-K</option>
                 <option value="1st">1st</option>
                 <option value="2nd">2nd</option>
                 <option value="3rd">3rd</option>
@@ -42,7 +42,7 @@
         const downloadBtn = document.getElementById('download-btn');
         const studentNameInput = document.getElementById('student-name');
         const classNameSelect = document.getElementById('class-name');
-        const apiKey = 'QxTdxXfBurEkxQVRoEzpzLi6'; // Replace with your remove.bg API key
+        const apiKey = 'ryNTxszadmyWMKaTuQmVy1Pt'; // Replace with your remove.bg API key
         let stream;
 
         // Open the device camera
@@ -86,18 +86,33 @@
                         const processedBlob = await response.blob();
                         const processedObjectURL = URL.createObjectURL(processedBlob);
 
-                        // Create an image object to resize and compress
+                        // Add a white background to the processed image
                         const img = new Image();
                         img.src = processedObjectURL;
-                        img.onload = async function() {
-                            const resizedAndCompressedImage = await resizeAndCompressImage(img);
-                            processedImage.src = resizedAndCompressedImage;
+                        img.onload = function() {
+                            const canvasWithWhiteBg = document.createElement('canvas');
+                            const ctx = canvasWithWhiteBg.getContext('2d');
+
+                            // Set the canvas size to the image size
+                            canvasWithWhiteBg.width = img.width;
+                            canvasWithWhiteBg.height = img.height;
+
+                            // Fill the canvas with a white background
+                            ctx.fillStyle = 'white';
+                            ctx.fillRect(0, 0, canvasWithWhiteBg.width, canvasWithWhiteBg.height);
+
+                            // Draw the processed image on top of the white background
+                            ctx.drawImage(img, 0, 0);
+
+                            // Set the processed image's source to the canvas data URL
+                            processedImage.src = canvasWithWhiteBg.toDataURL('image/jpeg');
                             processedImage.style.display = 'block';
                             downloadBtn.style.display = 'inline';
                         };
                     } else {
-                        console.error('Error:', response.statusText);
-                        alert('Background removal failed. Please try again.');
+                        const errorText = await response.text();
+                        console.error('Background removal failed:', errorText);
+                        alert('Background removal failed. Please try again. Error details: ' + errorText);
                     }
                 } catch (error) {
                     console.error('Error:', error);
@@ -121,42 +136,6 @@
             link.download = `${filename}.jpg`;
             link.click();
         });
-
-  // Helper function to resize, add white background, and compress the image
-  async function resizeAndCompressImage(img) {
-    const dpi = 96;
-    const inchesToPixels = dpi * 2; // 2 inches at 96 DPI
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    // Set canvas size to 2x2 inches in pixels
-    canvas.width = inchesToPixels;
-    canvas.height = inchesToPixels;
-
-    // Fill canvas with white background
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw the image on top of the white background
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    let quality = 0.9; // Start with high quality
-    let resizedCompressedImage = canvas.toDataURL('image/jpeg', quality);
-
-    // Adjust quality until image size is between 20KB and 25KB
-    while ((resizedCompressedImage.length > 25000 || resizedCompressedImage.length < 20000) && quality > 0.1) {
-        if (resizedCompressedImage.length > 25000) {
-            quality -= 0.05; // Decrease quality if image is too large
-        } else if (resizedCompressedImage.length < 20000) {
-            quality += 0.01; // Slightly increase quality if image is too small
-        }
-        resizedCompressedImage = canvas.toDataURL('image/jpeg', quality);
-    }
-
-    return resizedCompressedImage;
-}
-
-
     </script>
 </body>
 </html>
