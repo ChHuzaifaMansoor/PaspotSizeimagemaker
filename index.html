@@ -9,6 +9,7 @@
 <body>
     <div style="background-color: aqua;" class="container">
         <h2>GPS Badami Bagh</h2>
+        <div id="clock" style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Loading time...</div>
         <button id="open-camera">Open Camera</button>
         <video id="camera-stream" autoplay playsinline style="display: none;"></video>
         <button id="capture-photo" style="display: none;">Capture Photo</button>
@@ -35,6 +36,26 @@
     </div>
 
     <script>
+        // Fetch current time from the WorldTimeAPI
+        async function updateClock() {
+            try {
+                const response = await fetch("http://worldtimeapi.org/api/timezone/Asia/Karachi");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch time data");
+                }
+                const data = await response.json();
+                const currentTime = new Date(data.datetime).toLocaleTimeString();
+                const clockElement = document.getElementById("clock");
+                clockElement.textContent = `Current Time: ${currentTime}`;
+            } catch (error) {
+                console.error("Error fetching time:", error);
+                document.getElementById("clock").textContent = "Failed to load time.";
+            }
+        }
+
+        // Update the clock every second
+        setInterval(updateClock, 1000);
+
         const openCameraButton = document.getElementById('open-camera');
         const cameraStream = document.getElementById('camera-stream');
         const captureButton = document.getElementById('capture-photo');
